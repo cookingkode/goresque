@@ -40,7 +40,7 @@ func (c *Client) AddJob(namespace, queue, jobClass string, args ...interface{}) 
 		return -1, err
 	}
 
-	resp, err := conn.Do("RPUSH", c.nQ, string(jobJSON))
+	resp, err := conn.Do("RPUSH", c.nq, string(jobJSON))
 
 	return redis.Int64(resp, err)
 
