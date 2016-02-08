@@ -25,7 +25,7 @@ func DoInit(redisAddress, redisPassword, namespace, queue string) *Client {
 
 }
 
-func (c *Client) AddJob(namespace, queue, jobClass string, args ...interface{}) (int64, error) {
+func (c *Client) AddJob(jobClass string, args ...interface{}) (int64, error) {
 
 	conn := c.pool.Get()
 	defer conn.Close()
@@ -39,6 +39,8 @@ func (c *Client) AddJob(namespace, queue, jobClass string, args ...interface{}) 
 	if err != nil {
 		return -1, err
 	}
+
+	//fmt.Printf("Pushing on q %v JobClas %v\n", c.nq, jobClass)
 
 	resp, err := conn.Do("RPUSH", c.nq, string(jobJSON))
 
