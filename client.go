@@ -14,18 +14,18 @@ type job struct {
 
 type Client struct {
 	pool *redis.Pool
-	nq string
+	nq   string
 }
 
-func DoInit(redisAddress, redisPassword, namespace, queue string) (*Client){
-	return &Client {
+func DoInit(redisAddress, redisPassword, namespace, queue string) *Client {
+	return &Client{
 		newPool(redisAddress, redisPassword),
-		fmt.Sprintf("%squeue:%s", namespace, queue)
+		fmt.Sprintf("%squeue:%s", namespace, queue),
 	}
 
 }
 
-func (c* Client) AddJob(namespace, queue, jobClass string, args ...interface{}) (int64, error) {
+func (c *Client) AddJob(namespace, queue, jobClass string, args ...interface{}) (int64, error) {
 
 	conn := c.pool.Get()
 	defer conn.Close()
