@@ -3,6 +3,7 @@ package goresque
 import (
 	"encoding/json"
 	"github.com/garyburd/redigo/redis"
+	"time"
 )
 
 type job struct {
@@ -16,6 +17,9 @@ func DoInit(redisAddress, redisPassword string) {
 }
 
 func AddJob(queue, jobClass string, args ...interface{}) (int64, error) {
+	conn := pool.Get()
+	defer conn.Close()
+
 	// NOTE: Dirty hack to make a [{}] JSON struct
 	if len(args) == 0 {
 		args = append(make([]interface{}, 0), make(map[string]interface{}, 0))
