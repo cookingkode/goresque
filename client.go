@@ -2,6 +2,7 @@ package goresque
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/garyburd/redigo/redis"
 	"time"
 )
@@ -11,13 +12,22 @@ type job struct {
 	Args  []interface{} `json:"args"`
 }
 
-func DoInit(redisAddress, redisPassword string) {
-	pool = newPool(redisAddress, redisPassword)
+type Client struct {
+	pool *redis.Pool
+	nq string
+}
+
+func DoInit(redisAddress, redisPassword, namespace, queue string) (*Client){
+	return &Client {
+		newPool(redisAddress, redisPassword),
+		fmt.Sprintf("%squeue:%s", namespace, queue)
+	}
 
 }
 
-func AddJob(queue, jobClass string, args ...interface{}) (int64, error) {
-	conn := pool.Get()
+func (c* Client) AddJob(namespace, queue, jobClass string, args ...interface{}) (int64, error) {
+
+	conn := c.pool.Get()
 	defer conn.Close()
 
 	// NOTE: Dirty hack to make a [{}] JSON struct
@@ -30,7 +40,7 @@ func AddJob(queue, jobClass string, args ...interface{}) (int64, error) {
 		return -1, err
 	}
 
-	resp, err := conn.Do("RPUSH", queue, string(jobJSON))
+	resp, err := conn.Do("RPUSH", c.nQ, string(jobJSON))
 
 	return redis.Int64(resp, err)
 
