@@ -14,10 +14,11 @@ The client is thread-sage
 	import "github.com/cookingkode/goresque"
 	
 	brokerAddr := ":6379" //local redis instance
+	redisPassword := ""
 	namespace := "name_of_my_app"
 	queue := "high_priority_things"
 
- 	client := goresque.DoInit(brokerAddr,  namespace, queue)
+ 	client := goresque.DoInit(brokerAddr, redisPassword, namespace, queue)
 
  	client.AddJob("SomeJobClass", "InputA", "InputB")
 	client.AddJob("SomeOtherJobClass", "InputA", "InputB", "InputB")
